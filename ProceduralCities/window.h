@@ -5,6 +5,7 @@
 
 class Window {
 public:
+	Window() = default;
 	Window(const int width, const int height, const char* title);
 	~Window();
 
