@@ -13,7 +13,6 @@ public:
 		deltaTime = 0.0f;
 		lastFrame = 0.0f;
 		m_window = window;
-
 	}
 
 	void runLoop();

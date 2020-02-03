@@ -1,6 +1,8 @@
 #include "application.h"
+#include "renderer.h"
 
 void Application::runLoop(){
+	Renderer mRender;
 	while (!glfwWindowShouldClose(m_window.getWindow())) {
 		// per-frame time logic
 			// --------------------
@@ -14,8 +16,7 @@ void Application::runLoop(){
 
 		// render
 		// ------
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		mRender.finishRender(m_window, m_camera);
 
 		// glfw: swap buffers and pholl IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------

@@ -13,6 +13,9 @@ class Shader
 {
 public:
 	unsigned int ID;
+	Shader() {
+		Shader("standard.vert", "standard.frag");
+	}
 	// constructor generates the shader on the fly
 	// ------------------------------------------------------------------------
 	Shader(const char* vertexPath, const char* fragmentPath)
