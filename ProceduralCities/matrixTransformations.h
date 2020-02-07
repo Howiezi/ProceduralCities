@@ -6,16 +6,16 @@
 #include <glm/glm/gtc/type_ptr.hpp>
 
 #include "camera.h"
-#include "window.h"
 #include "mesh.h"
+#include "window.h"
 
-glm::mat4 getProjectionMatrix(Camera camera) {
-	glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 150.0f);
+glm::mat4 getProjectionMatrix(Camera *camera) {
+	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), 1.0f, 0.1f, 150.0f);
 	return projection;
 }
 
-glm::mat4 getViewMatrix(Camera camera) {
-	glm::mat4 view = camera.GetViewMatrix();
+glm::mat4 getViewMatrix(Camera *camera) {
+	glm::mat4 view = camera->GetViewMatrix();
 	return view;
 }
 

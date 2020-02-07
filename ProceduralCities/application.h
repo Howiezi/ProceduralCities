@@ -9,28 +9,29 @@
 class Application {
 
 public:
-	Application(Window window) {
+	Application(GLFWwindow *window, Camera *camera) {
 		deltaTime = 0.0f;
 		lastFrame = 0.0f;
 		m_window = window;
+		m_camera = camera;
 	}
 
 	void runLoop();
 
-	Camera& getCamera(){
+	Camera* getCamera(){
 		return m_camera;
 	}
 
-	Window& getWindow() {
+	GLFWwindow* getWindow() {
 		return m_window;
 	}
 
 private:
 
-	void processInput(GLFWwindow* window);
+	void processInput();
 
-	Window m_window;
-	Camera m_camera;
+	GLFWwindow* m_window;
+	Camera* m_camera;
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;

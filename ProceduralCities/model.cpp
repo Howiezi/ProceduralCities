@@ -1,4 +1,5 @@
 #include "model.h"
+#include <iostream>
 
 Model::Model(const Mesh& mesh) {
 	addData(mesh);

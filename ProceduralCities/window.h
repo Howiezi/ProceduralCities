@@ -1,18 +1,13 @@
 #pragma once
-#include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
 #include <iostream>
 //https://github.com/Saikedo/CPP-OpenGL-3D-Game-Engine/tree/master/Saik%20Engine
 
-// settings
-const unsigned SCR_WIDTH = 800;
-const unsigned SCR_HEIGHT = 600;
-
 class Window {
 public:
 	Window() = default;
-	Window(const char* title);
+	Window(const int width = 800, const int height = 600, const char* title = "Default");
 	~Window();
 
 	GLFWwindow* getWindow() {

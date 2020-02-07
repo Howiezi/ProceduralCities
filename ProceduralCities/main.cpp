@@ -1,16 +1,19 @@
 #pragma once
 #include <iostream>
 
-#include "window.h"
 #include "application.h"
-
-const char* title = "ProceduralCities";
+#include "glfwFunctions.h"
+#include "window.h"
 
 int main() {
 
-	Window window(title);
+	Window window(800,600,"Procedural Cities");
 
-	Application app(window);
+	Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+	initializeGLFW(window.getWindow(),&camera);
+
+	Application app(window.getWindow(),&camera);
 
 	app.runLoop();
 
