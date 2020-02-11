@@ -13,11 +13,13 @@ class Renderer {
 public:
 	Renderer() {
 		m_shader = Shader("standard.vert", "standard.frag");
+		m_shader.use();
+		m_shader.setInt("textureSample", 0);
 	}
 
 	void finishRender(GLFWwindow *window, Camera *camera);
 
-	void addModel(Model model);
+	void addModel(Model* model);
 
 private:
 

@@ -1,10 +1,15 @@
 #include "application.h"
+#include "texture.h"
 #include "renderer.h"
 #include "house.h"
 
 void Application::runLoop(){
+	Texture mTexture("grassTexture.jpg");
 	Renderer mRender;
-	mRender.addModel(getHouseModel());
+	Model mHouse = getSquareModel(10);
+	mRender.addModel(&mHouse);
+	// Uncomment for polygon mode
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	while (!glfwWindowShouldClose(m_window)) {
 		// per-frame time logic
 			// --------------------
@@ -25,6 +30,10 @@ void Application::runLoop(){
 		glfwSwapBuffers(m_window);
 		glfwPollEvents();
 	}
+
+	// glfw: terminate, clearing all previously allocated GLFW resources.
+	// ------------------------------------------------------------------
+	glfwTerminate();
 }
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly

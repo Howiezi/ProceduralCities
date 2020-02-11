@@ -5,8 +5,7 @@ float f = 0;
 float it = 0.0001;
 
 void Renderer::finishRender(GLFWwindow *window, Camera *camera) {
-
-	f += it;
+	//f += it;
 
 	if (f > 1 || f < 0) {
 		it *= -1;
@@ -25,13 +24,13 @@ void Renderer::finishRender(GLFWwindow *window, Camera *camera) {
 	m_shader.setMat4("view", getViewMatrix(camera));
 	m_shader.setMat4("model", getModelMatrix());
 
-	for (auto mesh : m_models) {
-		GL::bindVAO(mesh->vao);
-		GL::drawElements(mesh->indicesCount);
+	for (int mesh = 0; mesh < m_models.size();mesh++) {
+		GL::bindVAO(m_models[mesh]->vao);
+		GL::drawElements(m_models[mesh]->indicesCount);
 	}
 
 }
 
-void Renderer::addModel(Model model) {
-	m_models.push_back(&model.getRenderInfo());
+void Renderer::addModel(Model* model) {
+	m_models.push_back(&model->getRenderInfo());
 }
