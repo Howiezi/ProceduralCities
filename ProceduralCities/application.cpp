@@ -1,13 +1,14 @@
 #include "application.h"
-#include "texture.h"
 #include "renderer.h"
-#include "house.h"
+#include "squareMesh.h"
+#include "objects.h"
 
 void Application::runLoop(){
-	Texture mTexture("grassTexture.jpg");
 	Renderer mRender;
-	Model mHouse = getSquareModel(10);
-	mRender.addModel(&mHouse);
+	addSquareModelLess(100, &mRender);
+	addTreeModel(0.4f, 0.4f, &mRender);
+	//addTreeModel(0.6f, 0.6f, &mRender);
+	Texture btex("Textures/atlas.png");
 	// Uncomment for polygon mode
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	while (!glfwWindowShouldClose(m_window)) {

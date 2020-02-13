@@ -1,6 +1,8 @@
 #ifndef RENDERINFO_H_INCLUDED
 #define RENDERINFO_H_INCLUDED
 
+#include "texture.h"
+
 struct RenderInfo {
 	GLuint vao = 0;
 	GLuint indicesCount = 0;

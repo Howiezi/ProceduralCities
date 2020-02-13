@@ -24,6 +24,7 @@ public:
 	void bindVAO() const;
 
 	int getIndicesCount() const;
+	const std::string& textureFile() const;
 
 	const RenderInfo& getRenderInfo() const;
 

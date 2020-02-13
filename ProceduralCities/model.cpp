@@ -74,6 +74,7 @@ void Model::addVBO(int dimensions, const std::vector<GLfloat>& data){
 
 void Model::addEBO(const std::vector<GLuint>& indices){
 	m_renderInfo.indicesCount = static_cast<GLuint>(indices.size());
+
 	GLuint ebo;
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
