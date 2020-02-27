@@ -12,4 +12,9 @@ struct Mesh {
 	std::vector<GLuint> indices;
 };
 
+struct WorldMesh : Mesh {
+	unsigned width;
+	unsigned height;
+};
+
 #endif // MESH_H_INCLUDED

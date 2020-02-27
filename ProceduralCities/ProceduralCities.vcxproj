@@ -132,17 +132,23 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="glfwFunctions.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="meshUtility.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="objects.cpp" />
+    <ClCompile Include="ppm.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="window.cpp" />
+    <ClCompile Include="world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="GL.h" />
     <ClInclude Include="glfwFunctions.h" />
+    <ClInclude Include="meshUtility.h" />
+    <ClInclude Include="ppm.h" />
+    <ClInclude Include="world.h" />
     <ClInclude Include="squareMesh.h" />
     <ClInclude Include="matrixTransformations.h" />
     <ClInclude Include="mesh.h" />

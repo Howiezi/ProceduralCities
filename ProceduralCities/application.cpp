@@ -2,11 +2,15 @@
 #include "renderer.h"
 #include "squareMesh.h"
 #include "objects.h"
+#include "meshUtility.h"
+#include "world.h"
 
 void Application::runLoop(){
 	Renderer mRender;
-	addSquareModelLess(100, &mRender);
-	addTreeModel(0.4f, 0.4f, &mRender);
+	//addSquareModelLess(100, &mRender);
+	addWorldModelFromFile("heightmap.ppm",&mRender);
+
+	readModelsTextfile("Models.txt",&mRender);
 	//addTreeModel(0.6f, 0.6f, &mRender);
 	Texture btex("Textures/atlas.png");
 	// Uncomment for polygon mode
