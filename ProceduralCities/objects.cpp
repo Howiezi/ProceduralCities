@@ -1,4 +1,5 @@
 #include "objects.h"
+#include "texcoords.h"
 #include <iostream>
 
 Mesh getTreeMesh(float x, float y) {
@@ -157,6 +158,18 @@ void readModelsTextfile(const std::string& fname, Renderer* renderer) {
 
 			addTreeModel(x, y, renderer);
 		}
+		else if (type == "cylinder") {
+			float x, y, z, r, h;
+			if (!(iss >> x >> y >> z >> r >> h)) { break; }
+
+			addCylinderModel(x, y, z, r, h, renderer);
+		}
+		else if (type == "cube") {
+			float x, y, z, l;
+			if (!(iss >> x >> y >> z >> l)) { break; }
+
+			addCubeModel(x, y, z, l, renderer);
+		}
 		else {
 			continue;
 		}
@@ -172,21 +185,20 @@ Mesh createSphereMesh(float r, int subdivision) {
 
 	Mesh sphere;
 
-	// The top vertex of the sphere
-	sphere.vertexPositions.push_back(0);
-	sphere.vertexPositions.push_back(0);
-	sphere.vertexPositions.push_back(r);
+	for (int i = 0; i < 6; i++) {
+		// The top vertex of the sphere
+		sphere.vertexPositions.push_back(0);
+		sphere.vertexPositions.push_back(0);
+		sphere.vertexPositions.push_back(r);
 
-	sphere.textureCoords.push_back(5.5f * 46 / 5120 + 0.1f);
-	sphere.textureCoords.push_back(0.0f * 170 / 5120 + 0.9f);
+		sphere.textureCoords.push_back((1.0f+2.0f*i) * 46 / 5120 + 0.1f);
+		sphere.textureCoords.push_back(0.0f * 170 / 5120 + 0.9f);
 
-	for (int i = 0; i < 5; i++) {
 		// Vertexes of upper layer
 		sphere.vertexPositions.push_back(r * cosf(V_ANGLE) * cosf(H_ANGLE * i));
 		sphere.vertexPositions.push_back(r * cosf(V_ANGLE) * sinf(H_ANGLE * i));
 		sphere.vertexPositions.push_back(r * sinf(V_ANGLE));
 
-		// textures
 		sphere.textureCoords.push_back(2.0f * i * 46 / 5120 + 0.1f);
 		sphere.textureCoords.push_back(170.0f / 5120 + 0.9f);
 		
@@ -195,37 +207,38 @@ Mesh createSphereMesh(float r, int subdivision) {
 		sphere.vertexPositions.push_back(r * cosf(V_ANGLE) * sinf(H_ANGLE * i + PI / 5));
 		sphere.vertexPositions.push_back((-1) * r * sinf(V_ANGLE));
 
-		// Textures
 		sphere.textureCoords.push_back((2.0f * i + 1) * 46 / 5120 + 0.1f);
 		sphere.textureCoords.push_back(2.0f * 170 / 5120 + 0.9f);
 
-		// Top pentagon
-		sphere.indices.push_back(0);
-		sphere.indices.push_back(2 * i + 1);
-		sphere.indices.push_back((2 * (i + 1)) % 10 + 1);
+		// Bottom vertex of the sphere
+		sphere.vertexPositions.push_back(0);
+		sphere.vertexPositions.push_back(0);
+		sphere.vertexPositions.push_back(-r);
 
-		// Bottom pentagon
-		sphere.indices.push_back(11);
-		sphere.indices.push_back(2 * i + 2);
-		sphere.indices.push_back((2 * (i + 1)) % 10 + 2);
+		sphere.textureCoords.push_back((1.0f + 2.0f * i) * 46 / 5120 + 0.1f);
+		sphere.textureCoords.push_back(3.0f * 170 / 5120 + 0.9f);
 
-		// Ten side triangles
-		sphere.indices.push_back(i + 1);
-		sphere.indices.push_back(i + 2);
-		sphere.indices.push_back(i + 3);
+		if (i < 5) {
+			// Top pentagon
+			sphere.indices.push_back(i * 4 + 0);
+			sphere.indices.push_back(i * 4 + 1);
+			sphere.indices.push_back(i * 4 + 5);
 
-		sphere.indices.push_back(i + 6);
-		sphere.indices.push_back((i+6)%10 + 1);
-		sphere.indices.push_back((i+7)%10 + 1);
+			// Bottom pentagon
+			sphere.indices.push_back(i * 4 + 2);
+			sphere.indices.push_back(i * 4 + 3);
+			sphere.indices.push_back(i * 4 + 6);
+
+			// Ten side triangles
+			sphere.indices.push_back(i * 4 + 1);
+			sphere.indices.push_back(i * 4 + 2);
+			sphere.indices.push_back(i * 4 + 5);
+
+			sphere.indices.push_back(i * 4 + 2);
+			sphere.indices.push_back(i * 4 + 5);
+			sphere.indices.push_back(i * 4 + 6);
+		}
 	}
-
-	// Bottom vertex of the sphere
-	sphere.vertexPositions.push_back(0);
-	sphere.vertexPositions.push_back(0);
-	sphere.vertexPositions.push_back(-r);
-
-	sphere.textureCoords.push_back(5.5f * 46 / 5120 + 0.1f);
-	sphere.textureCoords.push_back(3.0f * 170 / 5120 + 0.9f);
 
 	subdivideSphere(subdivision, &sphere, r);
 
@@ -233,7 +246,7 @@ Mesh createSphereMesh(float r, int subdivision) {
 }
 
 Model getSphereModel(float x, float y, float z, float r) {
-	Mesh spheremesh = createSphereMesh(r,int(x));
+	Mesh spheremesh = createSphereMesh(r,4);
 	translateMesh(x, y, z, &spheremesh);
 	Model spheremodel(spheremesh);
 	return spheremodel;
@@ -256,16 +269,20 @@ void translateMesh(float x, float y, float z, Mesh* mesh) {
 void subdivideSphere(int subdivision, Mesh* sphere, float r) {
 	std::vector<GLfloat> tmpVertices;
 	std::vector<GLuint> tmpIndices;
+	std::vector<GLfloat> tmpTextures;
 	const float* v1, * v2, * v3;          // ptr to original vertices of a triangle
 	float newV1[3], newV2[3], newV3[3]; // new vertex positions
 	unsigned int index;
 
+	const float* t1, * t2, * t3;          // ptr to original textures of a triangle
+	float newT1[3], newT2[3], newT3[3]; // new texture positions
 	// iterate all subdivision levels
 	for (int i = 1; i <= subdivision; ++i)
 	{
 		// copy prev vertex/index arrays and clear
 		tmpVertices = sphere->vertexPositions;
 		tmpIndices = sphere->indices;
+		tmpTextures = sphere->textureCoords;
 		sphere->vertexPositions.clear();
 		sphere->textureCoords.clear();
 		sphere->indices.clear();
@@ -278,6 +295,20 @@ void subdivideSphere(int subdivision, Mesh* sphere, float r) {
 			v1 = &tmpVertices[tmpIndices[j] * 3];
 			v2 = &tmpVertices[tmpIndices[j + 1] * 3];
 			v3 = &tmpVertices[tmpIndices[j + 2] * 3];
+
+			// get 3 textures of a triangle
+			t1 = &tmpTextures[tmpIndices[j] * 2];
+			t2 = &tmpTextures[tmpIndices[j + 1] * 2];
+			t3 = &tmpTextures[tmpIndices[j + 2] * 2];
+
+			// compute 3 new textures
+			newT1[0] = (t1[0] + t2[0]) / 2;
+			newT2[0] = (t2[0] + t3[0]) / 2;
+			newT3[0] = (t1[0] + t3[0]) / 2;
+
+			newT1[1] = (t1[1] + t2[1]) / 2;
+			newT2[1] = (t2[1] + t3[1]) / 2;
+			newT3[1] = (t1[1] + t3[1]) / 2;
 
 			// compute 3 new vertices by spliting half on each edge
 			//         v1       
@@ -296,13 +327,6 @@ void subdivideSphere(int subdivision, Mesh* sphere, float r) {
 			addVertices(newV1, newV2, newV3, sphere);
 			addVertices(newV3, newV2, v3, sphere);
 
-			float newT1[2] = { 0.133f,0.95f };
-			float newT2[2] = { 0.15f,0.9f };
-			float newT3[2] = { 0.166f,0.95f };// new vertex positions
-			float t1[2] = { 0.15f,1.0f };
-			float t2[2] = { 0.1f,0.9f };
-			float t3[2] = { 0.2f,0.9f };
-
 			// add 4 new textures
 			addTextures(t1, newT1, newT3, sphere);
 			addTextures(newT1, t2, newT2, sphere);
@@ -317,8 +341,8 @@ void subdivideSphere(int subdivision, Mesh* sphere, float r) {
 			index += 12;    // next index
 		}
 	}
-	std::cout << "Vertex count: " << sphere->vertexPositions.size()/3 << std::endl;
-	std::cout << "Index count: " << sphere->indices.size() << std::endl;
+	//std::cout << "Vertex count: " << sphere->vertexPositions.size()/3 << std::endl;
+	//std::cout << "Index count: " << sphere->indices.size() << std::endl;
 }
 
 void addVertices(const float v1[3], const float v2[3], const float v3[3], Mesh* mesh) {
@@ -348,4 +372,153 @@ void computeHalfVertex(const float v1[3], const float v2[3], float newV[3], floa
 	newV[0] *= scale;
 	newV[1] *= scale;
 	newV[2] *= scale;
+}
+
+Mesh createCylinderMesh(float r, float h) {
+	Mesh cylinder;
+
+	// Constants for angle calculations
+	const int SEGMENTS = 24;
+	const float PI = 3.1415926f;
+	const float H_ANGLE = PI / 180 * 360 / SEGMENTS;
+	const float V_ANGLE = atanf(1.0f / 2);
+
+	// The top vertex of the sphere
+	float top[3] = { 0,0,h / 2 };
+	float bottom[3] = { 0,0,-h / 2 };
+	float nextT[3] = { r * cosf(H_ANGLE * 1),r * sinf(H_ANGLE * 1),h / 2 };
+	float prevT[3] = { r * cosf(H_ANGLE * 0),r * sinf(H_ANGLE * 0),h / 2 };
+	float nextB[3] = { r * cosf(H_ANGLE * 1),r * sinf(H_ANGLE * 1),-h / 2 };
+	float prevB[3] = { r * cosf(H_ANGLE * 0),r * sinf(H_ANGLE * 0),-h / 2 };
+
+	int index = 0;
+
+	for (int i = 2; i < SEGMENTS+2; i++) {
+		addVertices(top, nextT, prevT, &cylinder);
+		addVertices(nextB, nextT, prevT, &cylinder);
+		addVertices(nextB, prevT, prevB, &cylinder);
+		addVertices(bottom, nextB, prevB, &cylinder);
+
+		float t1[2], t2[2], t3[2], t4[2], t5[2], t6[2], t7[2];
+
+		getTexturecoords(t1, "bark");
+		getTexturecoords(t2, "bark");
+		getTexturecoords(t3, "bark");
+
+		getTexturecoords(t4, "bark");
+		getTexturecoords(t5, "bark");
+		getTexturecoords(t6, "bark");
+		getTexturecoords(t7, "bark");
+
+		addRelativetoTexture(t1, 0.5f, 0.5f);
+		addRelativetoTexture(t2, 0.5f + cosf(H_ANGLE * i)/2, 0.5f + sinf(H_ANGLE * i)/2);
+		addRelativetoTexture(t3, 0.5f + cosf(H_ANGLE * (i+1))/2, 0.5f + sinf(H_ANGLE * (i+1))/2);
+
+		addRelativetoTexture(t4, 1.0f / SEGMENTS * (i-2), 1.0f);
+		addRelativetoTexture(t5, 1.0f / SEGMENTS * (i-1), 1.0f);
+		addRelativetoTexture(t6, 1.0f / SEGMENTS * (i-2), 0.0f);
+		addRelativetoTexture(t7, 1.0f / SEGMENTS * (i-1), 0.0f);
+
+		// add 4 new textures
+		addTextures(t1, t3, t2, &cylinder);
+		addTextures(t7, t5, t4, &cylinder);
+		addTextures(t7, t4, t6, &cylinder);
+		addTextures(t1, t3, t2, &cylinder);
+
+		addIndices(index, index + 1, index + 2, &cylinder);
+		addIndices(index + 3, index + 4, index + 5, &cylinder);
+		addIndices(index + 6, index + 7, index + 8, &cylinder);
+		addIndices(index + 9, index + 10, index + 11, &cylinder);
+
+		index += 12;
+
+		prevT[0] = nextT[0];
+		prevB[0] = nextB[0];
+		prevT[1] = nextT[1];
+		prevB[1] = nextB[1];
+		nextT[0] = r * cosf(H_ANGLE * i);
+		nextT[1] = r * sinf(H_ANGLE * i);
+		nextB[0] = r * cosf(H_ANGLE * i);
+		nextB[1] = r * sinf(H_ANGLE * i);
+	}
+
+	return cylinder;
+}
+
+Model getCylinderModel(float x, float y, float z, float r, float h) {
+	Mesh cylinderMesh = createCylinderMesh(r, h);
+	translateMesh(x, y, z, &cylinderMesh);
+	Model cylinderModel(cylinderMesh);
+	return cylinderModel;
+}
+
+void addCylinderModel(float x, float y, float z, float r, float h, Renderer* renderer) {
+	auto cylinderModel = new Model;
+	*cylinderModel = getCylinderModel(x, y, z, r, h);
+	renderer->addModel(cylinderModel);
+}
+
+Mesh createCubeMesh(float l) {
+	Mesh cube;
+	std::cout << -l/2 << std::endl;
+	float top1[3] = { l / 2,l / 2,l / 2 };
+	float top2[3] = { l / 2,-l / 2,l / 2 };
+	float top3[3] = { -l / 2,l / 2,l / 2 };
+	float top4[3] = { -l / 2,-l / 2,l / 2 };
+
+	float bottom1[3] = { l / 2,l / 2,-l / 2 };
+	float bottom2[3] = { l / 2,-l / 2,-l / 2 };
+	float bottom3[3] = { -l / 2,l / 2,-l / 2 };
+	float bottom4[3] = { -l / 2,-l / 2,-l / 2 };
+
+	addVertices(top1, top2, top3, &cube);
+	addVertices(top2, top3, top4, &cube);
+
+	addVertices(top1, top2, bottom1, &cube);
+	addVertices(top2, bottom1, bottom2, &cube);
+
+	addVertices(top2, top4, bottom2, &cube);
+	addVertices(top4, bottom2, bottom4, &cube);
+
+	addVertices(top3, top1, bottom3, &cube);
+	addVertices(top1, bottom3, bottom1, &cube);
+
+	addVertices(top4, top3, bottom4, &cube);
+	addVertices(top3, bottom4, bottom3, &cube);
+
+	addVertices(bottom1, bottom2, bottom3, &cube);
+	addVertices(bottom2, bottom3, bottom4, &cube);
+
+	float t1[2], t2[2], t3[2], t4[2];
+
+	getTexturecoords(t1, "bark");
+	getTexturecoords(t2, "bark");
+	getTexturecoords(t3, "bark");
+	getTexturecoords(t4, "bark");
+
+	addRelativetoTexture(t2, 1.0f, 0.0f);
+	addRelativetoTexture(t3, 0.0f, 1.0f);
+	addRelativetoTexture(t4, 1.0f, 1.0f);
+
+	for (int i = 0; i < 36; i += 6) {
+		addIndices(i, i + 1, i + 2, &cube);
+		addIndices(i + 3, i + 4, i + 5, &cube);
+		addTextures(t1, t2, t3, &cube);
+		addTextures(t2, t3, t4, &cube);
+	}
+
+	return cube;
+}
+
+Model getCubeModel(float x, float y, float z, float l) {
+	Mesh cubeMesh = createCubeMesh(l);
+	translateMesh(x, y, z, &cubeMesh);
+	Model cubeModel(cubeMesh);
+	return cubeModel;
+}
+
+void addCubeModel(float x, float y, float z, float l, Renderer* renderer) {
+	auto cubeModel = new Model;
+	*cubeModel = getCubeModel(x, y, z, l);
+	renderer->addModel(cubeModel);
 }

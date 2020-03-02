@@ -137,6 +137,7 @@
     <ClCompile Include="objects.cpp" />
     <ClCompile Include="ppm.cpp" />
     <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="texcoords.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="window.cpp" />
     <ClCompile Include="world.cpp" />

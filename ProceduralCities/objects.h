@@ -10,6 +10,7 @@ Model getTreeModel(float x, float y);
 Model getBranchModel(float x, float y);
 void addTreeModel(float x, float y, Renderer* renderer);
 
+// change this function when adding more model functionality
 void readModelsTextfile(const std::string& fname, Renderer* renderer);
 
 Mesh createSphereMesh(float r, int subdivision);
@@ -23,5 +24,13 @@ void addVertices(const float v1[3], const float v2[3], const float v3[3], Mesh* 
 void addIndices(const unsigned int i1, const unsigned int i2, const unsigned int i3, Mesh* mesh);
 void addTextures(const float t1[2], const float t2[2], const float t3[2], Mesh* mesh);
 void computeHalfVertex(const float v1[3], const float v2[3], float newV[3], float radius);
+
+Mesh createCylinderMesh(float r, float h);
+Model getCylinderModel(float x, float y, float z, float r, float h);
+void addCylinderModel(float x, float y, float z, float r, float h, Renderer* renderer);
+
+Mesh createCubeMesh(float l);
+Model getCubeModel(float x, float y, float z, float l);
+void addCubeModel(float x, float y, float z, float l, Renderer* renderer);
 
 #endif // !OBJECTS_H_INCLUDED

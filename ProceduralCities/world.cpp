@@ -34,7 +34,7 @@ WorldMesh createWorldFromFile(const std::string& fname) {
 	}
 
 
-	createMountain(&heightmap, 20, 20);
+	createMountain(&heightmap, 50, 50);
 
 	//changeHeightWorldMesh(&heightmap, 100, 100, 5000);
 	return heightmap;
