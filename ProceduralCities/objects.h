@@ -33,4 +33,20 @@ Mesh createCubeMesh(float l);
 Model getCubeModel(float x, float y, float z, float l);
 void addCubeModel(float x, float y, float z, float l, Renderer* renderer);
 
+Mesh createTorusMesh(float rinn, float rout);
+Model getTorusModel(float x, float y, float z, float rinn, float rout);
+void addTorusModel(float x, float y, float z, float rinn, float rout, Renderer* renderer);
+
+Mesh createConicalMesh(float rupp, float rdown, float h);
+Model getConicalModel(float x, float y, float z, float rupp, float rdown, float h);
+void addConicalModel(float x, float y, float z, float rupp, float rdown, float h, Renderer* renderer);
+
+Mesh createCuboidMesh(float l, float w, float h);
+Model getCuboidModel(float x, float y, float z, float l, float w, float h);
+void addCuboidModel(float x, float y, float z, float l, float w, float h, Renderer* renderer);
+
+Mesh createPyramidMesh(float r);
+Model getPyramidModel(float x, float y, float z, float r);
+void addPyramidModel(float x, float y, float z, float r, Renderer* renderer);
+
 #endif // !OBJECTS_H_INCLUDED

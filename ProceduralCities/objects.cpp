@@ -170,6 +170,30 @@ void readModelsTextfile(const std::string& fname, Renderer* renderer) {
 
 			addCubeModel(x, y, z, l, renderer);
 		}
+		else if (type == "torus") {
+			float x, y, z, r1, r2;
+			if (!(iss >> x >> y >> z >> r1 >> r2)) { break; }
+
+			addTorusModel(x, y, z, r1, r2, renderer);
+		}
+		else if (type == "conical") {
+			float x, y, z, rupp, rdown, h;
+			if (!(iss >> x >> y >> z >> rupp >> rdown >> h)) { break; }
+
+			addConicalModel(x, y, z, rupp, rdown, h, renderer);
+		}
+		else if (type == "cuboid") {
+			float x, y, z, l, w, h;
+			if (!(iss >> x >> y >> z >> l >> w >> h)) { break; }
+
+			addCuboidModel(x, y, z, l, w, h, renderer);
+		}
+		else if (type == "pyramid") {
+			float x, y, z, r;
+			if (!(iss >> x >> y >> z >> r)) { break; }
+
+			addPyramidModel(x, y, z, r, renderer);
+		}
 		else {
 			continue;
 		}
@@ -460,7 +484,7 @@ void addCylinderModel(float x, float y, float z, float r, float h, Renderer* ren
 
 Mesh createCubeMesh(float l) {
 	Mesh cube;
-	std::cout << -l/2 << std::endl;
+
 	float top1[3] = { l / 2,l / 2,l / 2 };
 	float top2[3] = { l / 2,-l / 2,l / 2 };
 	float top3[3] = { -l / 2,l / 2,l / 2 };
@@ -521,4 +545,300 @@ void addCubeModel(float x, float y, float z, float l, Renderer* renderer) {
 	auto cubeModel = new Model;
 	*cubeModel = getCubeModel(x, y, z, l);
 	renderer->addModel(cubeModel);
+}
+
+Mesh createTorusMesh(float rinn, float rout) {
+	Mesh torus;
+
+	// Constants for angle calculations
+	const int SEGMENTS = 24;
+	const float PI = 3.1415926f;
+	const float H_ANGLE = PI / 180 * 360 / SEGMENTS;
+	const float V_ANGLE = atanf(1.0f / 2);
+
+	float nextI[3] = { rinn * cosf(H_ANGLE * 1),rinn * sinf(H_ANGLE * 1),0 };
+	float prevI[3] = { rinn * cosf(H_ANGLE * 0),rinn * sinf(H_ANGLE * 0),0 };
+
+	float nextO[3] = { rout * cosf(H_ANGLE * 1),rout * sinf(H_ANGLE * 1),0 };
+	float prevO[3] = { rout * cosf(H_ANGLE * 0),rout * sinf(H_ANGLE * 0),0 };
+
+	float nextU[3] = { (rout + rinn) / 2 * cosf(H_ANGLE * 1),(rout + rinn) / 2 * sinf(H_ANGLE * 1),(rout - rinn) / 2 };
+	float prevU[3] = { (rout + rinn) / 2 * cosf(H_ANGLE * 0),(rout + rinn) / 2 * sinf(H_ANGLE * 0),(rout - rinn) / 2 };
+
+	float nextD[3] = { (rout + rinn) / 2 * cosf(H_ANGLE * 1),(rout + rinn) / 2 * sinf(H_ANGLE * 1),-(rout - rinn) / 2 };
+	float prevD[3] = { (rout + rinn) / 2 * cosf(H_ANGLE * 0),(rout + rinn) / 2 * sinf(H_ANGLE * 0),-(rout - rinn) / 2 };
+
+	int index = 0;
+
+	for (int i = 2; i < SEGMENTS + 2; i++) {
+		addVertices(prevU, nextU, prevO, &torus);
+		addVertices(nextU, prevO, nextO, &torus);
+
+		addVertices(prevO, nextO, prevD, &torus);
+		addVertices(nextO, prevD, nextD, &torus);
+
+		addVertices(prevD, nextD, prevI, &torus);
+		addVertices(nextD, prevI, nextI, &torus);
+
+		addVertices(prevI, nextI, prevU, &torus);
+		addVertices(nextI, prevU, nextU, &torus);
+
+		float t1[2], t2[2], t3[2], t4[2];
+
+		getTexturecoords(t1, "bark");
+		getTexturecoords(t2, "bark");
+		getTexturecoords(t3, "bark");
+		getTexturecoords(t4, "bark");
+
+
+		addRelativetoTexture(t1, 0.0f, 0.0f);
+		addRelativetoTexture(t2, 1.0f, 0.0f);
+		addRelativetoTexture(t3, 0.0f, 1.0f);
+		addRelativetoTexture(t4, 1.0f, 1.0f);
+
+
+		// add 4 new textures
+		for (int i = 0; i < 4; i++) {
+			addTextures(t3, t4, t1, &torus);
+			addTextures(t4, t1, t2, &torus);
+		}
+
+		addIndices(index, index + 1, index + 2, &torus);
+		addIndices(index + 3, index + 4, index + 5, &torus);
+		addIndices(index + 6, index + 7, index + 8, &torus);
+		addIndices(index + 9, index + 10, index + 11, &torus);
+
+		addIndices(index + 12, index + 13, index + 14, &torus);
+		addIndices(index + 15, index + 16, index + 17, &torus);
+		addIndices(index + 18, index + 19, index + 20, &torus);
+		addIndices(index + 21, index + 22, index + 23, &torus);
+
+		index += 24;
+
+		prevU[0] = nextU[0];
+		prevO[0] = nextO[0];
+		prevD[0] = nextD[0];
+		prevI[0] = nextI[0];
+		prevU[1] = nextU[1];
+		prevO[1] = nextO[1];
+		prevD[1] = nextD[1];
+		prevI[1] = nextI[1];
+		nextU[0] = (rout + rinn) / 2 * cosf(H_ANGLE * i);
+		nextU[1] = (rout + rinn) / 2 * sinf(H_ANGLE * i);
+		nextO[0] = rout * cosf(H_ANGLE * i);
+		nextO[1] = rout * sinf(H_ANGLE * i);
+		nextD[0] = (rout + rinn) / 2 * cosf(H_ANGLE * i);
+		nextD[1] = (rout + rinn) / 2 * sinf(H_ANGLE * i);
+		nextI[0] = rinn * cosf(H_ANGLE * i);
+		nextI[1] = rinn * sinf(H_ANGLE * i);
+	}
+
+	return torus;
+}
+
+Model getTorusModel(float x, float y, float z, float rinn, float rout) {
+	Mesh torusMesh = createTorusMesh(rinn, rout);
+	translateMesh(x, y, z, &torusMesh);
+	Model torusModel(torusMesh);
+	return torusModel;
+}
+
+void addTorusModel(float x, float y, float z, float rinn, float rout, Renderer* renderer) {
+	auto torusModel = new Model;
+	*torusModel = getTorusModel(x, y, z, rinn, rout);
+	renderer->addModel(torusModel);
+}
+
+Mesh createConicalMesh(float rupp, float rdown, float h) {
+	Mesh conical;
+
+	// Constants for angle calculations
+	const int SEGMENTS = 24;
+	const float PI = 3.1415926f;
+	const float H_ANGLE = PI / 180 * 360 / SEGMENTS;
+	const float V_ANGLE = atanf(1.0f / 2);
+
+	// The top vertex of the sphere
+	float top[3] = { 0,0,h / 2 };
+	float bottom[3] = { 0,0,-h / 2 };
+	float nextT[3] = { rupp * cosf(H_ANGLE * 1),rupp * sinf(H_ANGLE * 1),h / 2 };
+	float prevT[3] = { rupp * cosf(H_ANGLE * 0),rupp * sinf(H_ANGLE * 0),h / 2 };
+	float nextB[3] = { rdown * cosf(H_ANGLE * 1),rdown * sinf(H_ANGLE * 1),-h / 2 };
+	float prevB[3] = { rdown * cosf(H_ANGLE * 0),rdown * sinf(H_ANGLE * 0),-h / 2 };
+
+	int index = 0;
+
+	for (int i = 2; i < SEGMENTS + 2; i++) {
+		addVertices(top, nextT, prevT, &conical);
+		addVertices(nextB, nextT, prevT, &conical);
+		addVertices(nextB, prevT, prevB, &conical);
+		addVertices(bottom, nextB, prevB, &conical);
+
+		float t1[2], t2[2], t3[2], t4[2], t5[2], t6[2], t7[2];
+
+		getTexturecoords(t1, "bark");
+		getTexturecoords(t2, "bark");
+		getTexturecoords(t3, "bark");
+
+		getTexturecoords(t4, "bark");
+		getTexturecoords(t5, "bark");
+		getTexturecoords(t6, "bark");
+		getTexturecoords(t7, "bark");
+
+		addRelativetoTexture(t1, 0.5f, 0.5f);
+		addRelativetoTexture(t2, 0.5f + cosf(H_ANGLE * i) / 2, 0.5f + sinf(H_ANGLE * i) / 2);
+		addRelativetoTexture(t3, 0.5f + cosf(H_ANGLE * (i + 1)) / 2, 0.5f + sinf(H_ANGLE * (i + 1)) / 2);
+
+		addRelativetoTexture(t4, 1.0f / SEGMENTS * (i - 2), 1.0f);
+		addRelativetoTexture(t5, 1.0f / SEGMENTS * (i - 1), 1.0f);
+		addRelativetoTexture(t6, 1.0f / SEGMENTS * (i - 2), 0.0f);
+		addRelativetoTexture(t7, 1.0f / SEGMENTS * (i - 1), 0.0f);
+
+		// add 4 new textures
+		addTextures(t1, t3, t2, &conical);
+		addTextures(t7, t5, t4, &conical);
+		addTextures(t7, t4, t6, &conical);
+		addTextures(t1, t3, t2, &conical);
+
+		addIndices(index, index + 1, index + 2, &conical);
+		addIndices(index + 3, index + 4, index + 5, &conical);
+		addIndices(index + 6, index + 7, index + 8, &conical);
+		addIndices(index + 9, index + 10, index + 11, &conical);
+
+		index += 12;
+
+		prevT[0] = nextT[0];
+		prevB[0] = nextB[0];
+		prevT[1] = nextT[1];
+		prevB[1] = nextB[1];
+		nextT[0] = rupp * cosf(H_ANGLE * i);
+		nextT[1] = rupp * sinf(H_ANGLE * i);
+		nextB[0] = rdown * cosf(H_ANGLE * i);
+		nextB[1] = rdown * sinf(H_ANGLE * i);
+	}
+
+	return conical;
+}
+
+Model getConicalModel(float x, float y, float z, float rupp, float rdown, float h) {
+	Mesh conicalMesh = createConicalMesh(rupp, rdown, h);
+	translateMesh(x, y, z, &conicalMesh);
+	Model conicalModel(conicalMesh);
+	return conicalModel;
+}
+
+void addConicalModel(float x, float y, float z, float rupp, float rdown, float h, Renderer* renderer) {
+	auto conicalModel = new Model;
+	*conicalModel = getConicalModel(x, y, z, rupp, rdown, h);
+	renderer->addModel(conicalModel);
+}
+
+Mesh createCuboidMesh(float l, float w,float h) {
+	Mesh cuboid;
+
+	float top1[3] = { l / 2,w / 2,h/ 2 };
+	float top2[3] = { l / 2,-w / 2,h / 2 };
+	float top3[3] = { -l / 2,w / 2,h / 2 };
+	float top4[3] = { -l / 2,-w / 2,h/ 2 };
+
+	float bottom1[3] = { l / 2,w / 2,-h / 2 };
+	float bottom2[3] = { l / 2,-w / 2,-h / 2 };
+	float bottom3[3] = { -l / 2,w / 2,-h / 2 };
+	float bottom4[3] = { -l / 2,-w / 2,-h / 2 };
+
+	addVertices(top1, top2, top3, &cuboid);
+	addVertices(top2, top3, top4, &cuboid);
+
+	addVertices(top1, top2, bottom1, &cuboid);
+	addVertices(top2, bottom1, bottom2, &cuboid);
+
+	addVertices(top2, top4, bottom2, &cuboid);
+	addVertices(top4, bottom2, bottom4, &cuboid);
+
+	addVertices(top3, top1, bottom3, &cuboid);
+	addVertices(top1, bottom3, bottom1, &cuboid);
+
+	addVertices(top4, top3, bottom4, &cuboid);
+	addVertices(top3, bottom4, bottom3, &cuboid);
+
+	addVertices(bottom1, bottom2, bottom3, &cuboid);
+	addVertices(bottom2, bottom3, bottom4, &cuboid);
+
+	float t1[2], t2[2], t3[2], t4[2];
+
+	getTexturecoords(t1, "bark");
+	getTexturecoords(t2, "bark");
+	getTexturecoords(t3, "bark");
+	getTexturecoords(t4, "bark");
+
+	addRelativetoTexture(t2, 1.0f, 0.0f);
+	addRelativetoTexture(t3, 0.0f, 1.0f);
+	addRelativetoTexture(t4, 1.0f, 1.0f);
+
+	for (int i = 0; i < 36; i += 6) {
+		addIndices(i, i + 1, i + 2, &cuboid);
+		addIndices(i + 3, i + 4, i + 5, &cuboid);
+		addTextures(t1, t2, t3, &cuboid);
+		addTextures(t2, t3, t4, &cuboid);
+	}
+
+	return cuboid;
+}
+
+Model getCuboidModel(float x, float y, float z, float l, float w, float h) {
+	Mesh cuboidMesh = createCuboidMesh(l, w, h);
+	translateMesh(x, y, z, &cuboidMesh);
+	Model cuboidModel(cuboidMesh);
+	return cuboidModel;
+}
+
+void addCuboidModel(float x, float y, float z, float l, float w, float h, Renderer* renderer) {
+	auto cuboidModel = new Model;
+	*cuboidModel = getCuboidModel(x, y, z, l, w, h);
+	renderer->addModel(cuboidModel);
+}
+
+Mesh createPyramidMesh(float r) {
+	Mesh pyramid;
+
+	float top[3] = { 0,0,r };
+
+	float bottom1[3] = { r * sqrt(8) / 3,0,-r / 3 };
+	float bottom2[3] = { -r * sqrt(8) / 6,r * sqrt(6) / 3,-r / 3 };
+	float bottom3[3] = { -r * sqrt(8) / 6,-r * sqrt(6) / 3,-r / 3 };
+
+	addVertices(top, bottom1, bottom2, &pyramid);
+	addVertices(top, bottom2, bottom3, &pyramid);
+	addVertices(top, bottom3, bottom1, &pyramid);
+	addVertices(bottom1, bottom2, bottom3, &pyramid);
+
+	float t1[2], t2[2], t3[2];
+
+	getTexturecoords(t1, "bark");
+	getTexturecoords(t2, "bark");
+	getTexturecoords(t3, "bark");
+
+	addRelativetoTexture(t1, 0.5f, 1.0f);
+	addRelativetoTexture(t2, 0.0f, 0.0f);
+	addRelativetoTexture(t3, 1.0f, 0.0f);
+
+	for (int i = 0; i < 12; i += 3) {
+		addIndices(i, i + 1, i + 2, &pyramid);
+		addTextures(t1, t2, t3, &pyramid);
+	}
+
+	return pyramid;
+}
+
+Model getPyramidModel(float x, float y, float z, float r) {
+	Mesh pyramidMesh = createPyramidMesh(r);
+	translateMesh(x, y, z, &pyramidMesh);
+	Model pyramidModel(pyramidMesh);
+	return pyramidModel;
+}
+
+void addPyramidModel(float x, float y, float z, float r, Renderer* renderer) {
+	auto pyramidModel = new Model;
+	*pyramidModel = getPyramidModel(x, y, z, r);
+	renderer->addModel(pyramidModel);
 }
