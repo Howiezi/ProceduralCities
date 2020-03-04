@@ -10,4 +10,7 @@ WorldMesh createWorldFromFile(const std::string& fname);
 Model getWorldModelFromFile(const std::string& fname);
 void addWorldModelFromFile(const std::string& fname, Renderer* renderer);
 
+void readRoadFile(const std::string& fname, WorldMesh* world);
+void createRoad(int x1, int y1, int x2, int y2, WorldMesh* world);
+
 #endif // !WORLD_H_INCLUDED

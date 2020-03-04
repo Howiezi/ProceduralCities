@@ -26,10 +26,15 @@ void getTexturecoords(float* a, const std::string& tname) {
 		a[0] = 3.0f / ATLASWIDTH;
 		a[1] = 9.0f / ATLASHEIGHT;
 	}
+	else if (tname == "road") {
+		a[0] = 4.0f / ATLASWIDTH;
+		a[1] = 9.0f / ATLASHEIGHT;
+	}
 	else if (tname == "stone") {
 		a[0] = 0.0f / ATLASWIDTH;
 		a[1] = 8.0f / ATLASHEIGHT;
 	}
+
 }
 
 

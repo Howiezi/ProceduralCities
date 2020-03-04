@@ -33,9 +33,9 @@ Mesh createCubeMesh(float l);
 Model getCubeModel(float x, float y, float z, float l);
 void addCubeModel(float x, float y, float z, float l, Renderer* renderer);
 
-Mesh createTorusMesh(float rinn, float rout);
-Model getTorusModel(float x, float y, float z, float rinn, float rout);
-void addTorusModel(float x, float y, float z, float rinn, float rout, Renderer* renderer);
+Mesh createTorusMesh(float r1, float r2);
+Model getTorusModel(float x, float y, float z, float r1, float r2);
+void addTorusModel(float x, float y, float z, float r1, float r2, Renderer* renderer);
 
 Mesh createConicalMesh(float rupp, float rdown, float h);
 Model getConicalModel(float x, float y, float z, float rupp, float rdown, float h);

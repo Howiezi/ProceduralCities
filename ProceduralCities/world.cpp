@@ -33,9 +33,6 @@ WorldMesh createWorldFromFile(const std::string& fname) {
 		heightmap.indices.push_back(i / (image.width - 1) + i + image.width + 1);
 	}
 
-
-	createMountain(&heightmap, 50, 50);
-
 	//changeHeightWorldMesh(&heightmap, 100, 100, 5000);
 	return heightmap;
 }
@@ -50,4 +47,32 @@ void addWorldModelFromFile(const std::string& fname, Renderer* renderer) {
 	auto squareModel = new Model;
 	*squareModel = getWorldModelFromFile(fname);
 	renderer->addModel(squareModel);
+}
+
+void readRoadFile(const std::string& fname, WorldMesh* world) {
+	std::ifstream infile(fname);
+	std::string line;
+	while (std::getline(infile, line)) {
+
+		std::istringstream iss(line);
+		std::string type;
+
+		if (!(iss >> type)) { break; }
+
+		if (type == "road") {
+			float x1, y1, x2, y2;
+			if (!(iss >> x1 >> y1 >> x2 >> y2)) { break; }
+
+			createRoad(x1, y1, x2, y2, world);
+
+		}
+		else {
+			continue;
+		}
+
+	}
+}
+
+void createRoad(int x1, int y1, int x2, int y2, WorldMesh* world) {
+
 }

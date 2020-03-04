@@ -547,105 +547,88 @@ void addCubeModel(float x, float y, float z, float l, Renderer* renderer) {
 	renderer->addModel(cubeModel);
 }
 
-Mesh createTorusMesh(float rinn, float rout) {
+Mesh createTorusMesh(float r1, float r2) {
 	Mesh torus;
 
 	// Constants for angle calculations
-	const int SEGMENTS = 24;
+	const int SEGMENTSR1 = 48;
+	const int SEGMENTSR2 = 24;
 	const float PI = 3.1415926f;
-	const float H_ANGLE = PI / 180 * 360 / SEGMENTS;
-	const float V_ANGLE = atanf(1.0f / 2);
+	const float R1_ANGLE = PI / 180 * 360 / SEGMENTSR1;
+	const float R2_ANGLE = PI / 180 * 360 / SEGMENTSR2;
 
-	float nextI[3] = { rinn * cosf(H_ANGLE * 1),rinn * sinf(H_ANGLE * 1),0 };
-	float prevI[3] = { rinn * cosf(H_ANGLE * 0),rinn * sinf(H_ANGLE * 0),0 };
+	float prevI[3] = { cosf(R1_ANGLE * 0) * (r1 + r2 * cosf(R2_ANGLE * 0)),sinf(R1_ANGLE * 0) * (r1 + r2 * cosf(R2_ANGLE * 0)),r2 * sinf(R2_ANGLE * 0) };
+	float nextI[3] = { cosf(R1_ANGLE * 1) * (r1 + r2 * cosf(R2_ANGLE * 0)),sinf(R1_ANGLE * 1) * (r1 + r2 * cosf(R2_ANGLE * 0)),r2 * sinf(R2_ANGLE * 0) };
 
-	float nextO[3] = { rout * cosf(H_ANGLE * 1),rout * sinf(H_ANGLE * 1),0 };
-	float prevO[3] = { rout * cosf(H_ANGLE * 0),rout * sinf(H_ANGLE * 0),0 };
-
-	float nextU[3] = { (rout + rinn) / 2 * cosf(H_ANGLE * 1),(rout + rinn) / 2 * sinf(H_ANGLE * 1),(rout - rinn) / 2 };
-	float prevU[3] = { (rout + rinn) / 2 * cosf(H_ANGLE * 0),(rout + rinn) / 2 * sinf(H_ANGLE * 0),(rout - rinn) / 2 };
-
-	float nextD[3] = { (rout + rinn) / 2 * cosf(H_ANGLE * 1),(rout + rinn) / 2 * sinf(H_ANGLE * 1),-(rout - rinn) / 2 };
-	float prevD[3] = { (rout + rinn) / 2 * cosf(H_ANGLE * 0),(rout + rinn) / 2 * sinf(H_ANGLE * 0),-(rout - rinn) / 2 };
-
+	float prevO[3] = { cosf(R1_ANGLE * 0) * (r1 + r2 * cosf(R2_ANGLE * 1)),sinf(R1_ANGLE * 0) * (r1 + r2 * cosf(R2_ANGLE * 1)),r2 * sinf(R2_ANGLE * 1) };
+	float nextO[3] = { cosf(R1_ANGLE * 1) * (r1 + r2 * cosf(R2_ANGLE * 1)),sinf(R1_ANGLE * 1) * (r1 + r2 * cosf(R2_ANGLE * 1)),r2 * sinf(R2_ANGLE * 1) };
+	
 	int index = 0;
 
-	for (int i = 2; i < SEGMENTS + 2; i++) {
-		addVertices(prevU, nextU, prevO, &torus);
-		addVertices(nextU, prevO, nextO, &torus);
+	for (int i = 2; i < SEGMENTSR1 + 2; i++) {
+		for (int j = 2; j < SEGMENTSR2 + 2; j++) {
+			addVertices(prevI, nextI, prevO, &torus);
+			addVertices(nextI, prevO, nextO, &torus);
 
-		addVertices(prevO, nextO, prevD, &torus);
-		addVertices(nextO, prevD, nextD, &torus);
+			float t1[2], t2[2], t3[2], t4[2];
 
-		addVertices(prevD, nextD, prevI, &torus);
-		addVertices(nextD, prevI, nextI, &torus);
+			getTexturecoords(t1, "bark");
+			getTexturecoords(t2, "bark");
+			getTexturecoords(t3, "bark");
+			getTexturecoords(t4, "bark");
 
-		addVertices(prevI, nextI, prevU, &torus);
-		addVertices(nextI, prevU, nextU, &torus);
+			addRelativetoTexture(t1, 0.0f, 0.0f);
+			addRelativetoTexture(t2, 1.0f, 0.0f);
+			addRelativetoTexture(t3, 1.0f, 1.0f);
+			addRelativetoTexture(t4, 0.0f, 1.0f);
 
-		float t1[2], t2[2], t3[2], t4[2];
+			addTextures(t4, t3, t1, &torus);
+			addTextures(t3, t1, t2, &torus);
 
-		getTexturecoords(t1, "bark");
-		getTexturecoords(t2, "bark");
-		getTexturecoords(t3, "bark");
-		getTexturecoords(t4, "bark");
+			addIndices(index, index + 1, index + 2, &torus);
+			addIndices(index + 3, index + 4, index + 5, &torus);
 
+			index += 6;
 
-		addRelativetoTexture(t1, 0.0f, 0.0f);
-		addRelativetoTexture(t2, 1.0f, 0.0f);
-		addRelativetoTexture(t3, 0.0f, 1.0f);
-		addRelativetoTexture(t4, 1.0f, 1.0f);
+			prevI[0] = prevO[0];
+			prevI[1] = prevO[1];
+			prevI[2] = prevO[2];
+			nextI[0] = nextO[0];
+			nextI[1] = nextO[1];
+			nextI[2] = nextO[2];
 
-
-		// add 4 new textures
-		for (int i = 0; i < 4; i++) {
-			addTextures(t3, t4, t1, &torus);
-			addTextures(t4, t1, t2, &torus);
+			nextO[0] = cosf(R1_ANGLE * (i - 1)) * (r1 + r2 * cosf(R2_ANGLE * j));
+			nextO[1] = sinf(R1_ANGLE * (i - 1)) * (r1 + r2 * cosf(R2_ANGLE * j));
+			nextO[2] = r2 * sinf(R2_ANGLE * j);
+			prevO[0] = cosf(R1_ANGLE * (i - 2)) * (r1 + r2 * cosf(R2_ANGLE * j));
+			prevO[1] = sinf(R1_ANGLE * (i - 2)) * (r1 + r2 * cosf(R2_ANGLE * j));
+			prevO[2] = r2 * sinf(R2_ANGLE * j);
 		}
 
-		addIndices(index, index + 1, index + 2, &torus);
-		addIndices(index + 3, index + 4, index + 5, &torus);
-		addIndices(index + 6, index + 7, index + 8, &torus);
-		addIndices(index + 9, index + 10, index + 11, &torus);
-
-		addIndices(index + 12, index + 13, index + 14, &torus);
-		addIndices(index + 15, index + 16, index + 17, &torus);
-		addIndices(index + 18, index + 19, index + 20, &torus);
-		addIndices(index + 21, index + 22, index + 23, &torus);
-
-		index += 24;
-
-		prevU[0] = nextU[0];
-		prevO[0] = nextO[0];
-		prevD[0] = nextD[0];
 		prevI[0] = nextI[0];
-		prevU[1] = nextU[1];
-		prevO[1] = nextO[1];
-		prevD[1] = nextD[1];
 		prevI[1] = nextI[1];
-		nextU[0] = (rout + rinn) / 2 * cosf(H_ANGLE * i);
-		nextU[1] = (rout + rinn) / 2 * sinf(H_ANGLE * i);
-		nextO[0] = rout * cosf(H_ANGLE * i);
-		nextO[1] = rout * sinf(H_ANGLE * i);
-		nextD[0] = (rout + rinn) / 2 * cosf(H_ANGLE * i);
-		nextD[1] = (rout + rinn) / 2 * sinf(H_ANGLE * i);
-		nextI[0] = rinn * cosf(H_ANGLE * i);
-		nextI[1] = rinn * sinf(H_ANGLE * i);
+		prevO[0] = nextO[0];
+		prevO[1] = nextO[1];
+
+		nextO[0] = cosf(R1_ANGLE * i) * (r1 + r2 * cosf(R2_ANGLE * 1));
+		nextO[1] = sinf(R1_ANGLE * i) * (r1 + r2 * cosf(R2_ANGLE * 1));
+		nextI[0] = cosf(R1_ANGLE * i) * (r1 + r2 * cosf(R2_ANGLE * 0));
+		nextI[1] = sinf(R1_ANGLE * i) * (r1 + r2 * cosf(R2_ANGLE * 0));
 	}
 
 	return torus;
 }
 
-Model getTorusModel(float x, float y, float z, float rinn, float rout) {
-	Mesh torusMesh = createTorusMesh(rinn, rout);
+Model getTorusModel(float x, float y, float z, float r1, float r2) {
+	Mesh torusMesh = createTorusMesh(r1, r2);
 	translateMesh(x, y, z, &torusMesh);
 	Model torusModel(torusMesh);
 	return torusModel;
 }
 
-void addTorusModel(float x, float y, float z, float rinn, float rout, Renderer* renderer) {
+void addTorusModel(float x, float y, float z, float r1, float r2, Renderer* renderer) {
 	auto torusModel = new Model;
-	*torusModel = getTorusModel(x, y, z, rinn, rout);
+	*torusModel = getTorusModel(x, y, z, r1, r2);
 	renderer->addModel(torusModel);
 }
 
