@@ -74,5 +74,20 @@ void readRoadFile(const std::string& fname, WorldMesh* world) {
 }
 
 void createRoad(int x1, int y1, int x2, int y2, WorldMesh* world) {
+	const int ROADSUBDIVISION = 5;
+	int xcoords[ROADSUBDIVISION+2];
+	int ycoords[ROADSUBDIVISION+2];
 
+	xcoords[0] = x1;
+	xcoords[ROADSUBDIVISION+1] = x2;
+	ycoords[0] = y1;
+	ycoords[ROADSUBDIVISION + 1] = y2;
+
+	for (int i = 1; i < ROADSUBDIVISION + 1; i++) {
+
+	}
+}
+
+int computeMiddle(int x1, int x2) {
+	return (x1 + x2) / 2;
 }
