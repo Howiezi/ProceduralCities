@@ -34,7 +34,26 @@ void getTexturecoords(float* a, const std::string& tname) {
 		a[0] = 0.0f / ATLASWIDTH;
 		a[1] = 8.0f / ATLASHEIGHT;
 	}
-
+	else if (tname == "apartment") {
+		a[0] = 5.0f / ATLASWIDTH;
+		a[1] = 9.0f / ATLASHEIGHT;
+	}
+	else if (tname == "water") {
+		a[0] = 6.0f / ATLASWIDTH;
+		a[1] = 9.0f / ATLASHEIGHT;
+	}
+	else if (tname == "dirt") {
+		a[0] = 7.0f / ATLASWIDTH;
+		a[1] = 9.0f / ATLASHEIGHT;
+	}
+	else if (tname == "brick") {
+		a[0] = 8.0f / ATLASWIDTH;
+		a[1] = 9.0f / ATLASHEIGHT;
+	}
+	else if (tname == "roof") {
+		a[0] = 9.0f / ATLASWIDTH;
+		a[1] = 9.0f / ATLASHEIGHT;
+	}
 }
 
 

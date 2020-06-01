@@ -1,0 +1,26 @@
+sphere		0	1	1	0.4			road
+sphere		1	1	1	0.3
+sphere		2	1	1	0.5
+torus		0	2	1	0.2	0.1		stone
+torus		1	2	1	0.2	0.2
+torus		2	2	1	0.2	0.3
+cylinder	0	3	1	0.4	0.5		road
+cylinder	1	3	1	0.3	1
+cylinder	2	3	1	0.2	1.5
+conical		0	4	1	0.4	0.2	0.5	grass
+conical		1	4	1	0.5	0.2	1
+conical		2	4	1	0.4	0	1
+cube		0	5	1	0.5			branch
+cube		1	5	1	0.3
+cube		2	5	1	0.4
+cuboid		0	6	1	0.5	0.7	0.3	snow
+cuboid		1	6	1	0.4	0.2	0.5
+cuboid		2	6	1	0.2	0.6	0.4
+pyramid		0	7	1	0.4			bark
+pyramid		1	7	1	0.2
+pyramid		2	7	1	0.7
+tree		10	0
+tree		13	0
+road		50	50	70	90			bark
+mountain	30	20	20	10
+sphere		-1	-1	1	0.5

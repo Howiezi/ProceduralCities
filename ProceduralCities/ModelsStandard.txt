@@ -1,0 +1,11 @@
+shape		x	y	z	dimensions		texture
+sphere		0	0	1	0.4			grass
+torus		0	1	1	0.2	0.1		bark
+cylinder	0	2	1	0.4	0.5		stone
+conical		1	0	1	0.4	0.2	0.5	snow
+cube		1	1	1	0.5			road
+cuboid		1	2	1	0.5	0.7	0.3	stone
+pyramid		2	0	1	0.4			grass
+tree		10	0
+road		50	50	70	90
+mountain	30	20	20	10

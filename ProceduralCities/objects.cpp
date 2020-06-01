@@ -1,6 +1,7 @@
 #include "objects.h"
 #include "texcoords.h"
 #include <iostream>
+#include <time.h>
 
 Mesh getTreeMesh(float x, float y) {
 	Mesh tree;
@@ -142,14 +143,15 @@ void readModelsTextfile(const std::string& fname, Renderer* renderer) {
 
 		std::istringstream iss(line);
 		std::string type;
+		std::string texture;
 
 		if (!(iss >> type)) { break; }
 		
 		if (type == "sphere") {
 			float x, y, z, r;
 			if (!(iss >> x >> y >> z >> r)) { break; }
-
-			addSphereModel(x, y, z, r, renderer);
+			if (!(iss >> texture)) { addSphereModel(x, y, z, r, renderer, "bark"); }
+			else { addSphereModel(x, y, z, r, renderer, texture);}
 
 		}
 		else if (type == "tree") {
@@ -162,37 +164,56 @@ void readModelsTextfile(const std::string& fname, Renderer* renderer) {
 			float x, y, z, r, h;
 			if (!(iss >> x >> y >> z >> r >> h)) { break; }
 
-			addCylinderModel(x, y, z, r, h, renderer);
+			if (!(iss >> texture)) { addCylinderModel(x, y, z, r, h, renderer, "bark"); }
+			else { addCylinderModel(x, y, z, r, h, renderer, texture); }
 		}
 		else if (type == "cube") {
 			float x, y, z, l;
 			if (!(iss >> x >> y >> z >> l)) { break; }
 
-			addCubeModel(x, y, z, l, renderer);
+			if (!(iss >> texture)) { addCubeModel(x, y, z, l, renderer,"bark"); }
+			else { addCubeModel(x, y, z, l, renderer,texture); }
 		}
 		else if (type == "torus") {
 			float x, y, z, r1, r2;
 			if (!(iss >> x >> y >> z >> r1 >> r2)) { break; }
 
-			addTorusModel(x, y, z, r1, r2, renderer);
+			if (!(iss >> texture)) { addTorusModel(x, y, z, r1, r2, renderer,"bark"); }
+			else { addTorusModel(x, y, z, r1, r2, renderer, texture); }
 		}
 		else if (type == "conical") {
 			float x, y, z, rupp, rdown, h;
 			if (!(iss >> x >> y >> z >> rupp >> rdown >> h)) { break; }
 
-			addConicalModel(x, y, z, rupp, rdown, h, renderer);
+			if (!(iss >> texture)) { addConicalModel(x, y, z, rupp, rdown, h, renderer,"bark"); }
+			else { addConicalModel(x, y, z, rupp, rdown, h, renderer, texture); }
 		}
 		else if (type == "cuboid") {
 			float x, y, z, l, w, h;
 			if (!(iss >> x >> y >> z >> l >> w >> h)) { break; }
 
-			addCuboidModel(x, y, z, l, w, h, renderer);
+			if (!(iss >> texture)) { addCuboidModel(x, y, z, l, w, h, renderer,"bark"); }
+			else { addCuboidModel(x, y, z, l, w, h, renderer, texture); }
 		}
 		else if (type == "pyramid") {
 			float x, y, z, r;
 			if (!(iss >> x >> y >> z >> r)) { break; }
 
-			addPyramidModel(x, y, z, r, renderer);
+			if (!(iss >> texture)) { addPyramidModel(x, y, z, r, renderer, "bark"); }
+			else { addPyramidModel(x, y, z, r, renderer, texture); }
+		}
+		else if (type == "road") {
+			float x1, y1, x2, y2;
+			if (!(iss >> x1 >> y1 >> x2 >> y2)) { break; }
+			if (!(iss >> texture)) { createRoadBetter(x1, y1, x2, y2, renderer,"road"); }
+			else { createRoadBetter(x1, y1, x2, y2, renderer,texture); }
+
+		}
+		else if (type == "mountain") {
+			float x, y, height, radius;
+			if (!(iss >> x >> y >> height >> radius)) { break; }
+		
+			addMountainModel(x, y, height, radius, renderer);
 		}
 		else {
 			continue;
@@ -201,7 +222,7 @@ void readModelsTextfile(const std::string& fname, Renderer* renderer) {
 	}
 }
 
-Mesh createSphereMesh(float r, int subdivision) {
+Mesh createSphereMesh(float r, int subdivision, const std::string& texture) {
 	// Constants for angle calculations
 	const float PI = 3.1415926f;
 	const float H_ANGLE = PI / 180 * 72;
@@ -209,38 +230,42 @@ Mesh createSphereMesh(float r, int subdivision) {
 
 	Mesh sphere;
 
+	float t1[2];
+
+	getTexturecoords(t1, texture);
+
 	for (int i = 0; i < 6; i++) {
 		// The top vertex of the sphere
 		sphere.vertexPositions.push_back(0);
 		sphere.vertexPositions.push_back(0);
 		sphere.vertexPositions.push_back(r);
 
-		sphere.textureCoords.push_back((1.0f+2.0f*i) * 46 / 5120 + 0.1f);
-		sphere.textureCoords.push_back(0.0f * 170 / 5120 + 0.9f);
+		sphere.textureCoords.push_back((1.0f+2.0f*i) * 46 / 5120 + t1[0]);
+		sphere.textureCoords.push_back(0.0f * 170 / 5120 + t1[1]);
 
 		// Vertexes of upper layer
 		sphere.vertexPositions.push_back(r * cosf(V_ANGLE) * cosf(H_ANGLE * i));
 		sphere.vertexPositions.push_back(r * cosf(V_ANGLE) * sinf(H_ANGLE * i));
 		sphere.vertexPositions.push_back(r * sinf(V_ANGLE));
 
-		sphere.textureCoords.push_back(2.0f * i * 46 / 5120 + 0.1f);
-		sphere.textureCoords.push_back(170.0f / 5120 + 0.9f);
+		sphere.textureCoords.push_back(2.0f * i * 46 / 5120 + t1[0]);
+		sphere.textureCoords.push_back(170.0f / 5120 + t1[1]);
 		
 		// Vertextes of bottom layer
 		sphere.vertexPositions.push_back(r * cosf(V_ANGLE) * cosf(H_ANGLE * i + PI / 5));
 		sphere.vertexPositions.push_back(r * cosf(V_ANGLE) * sinf(H_ANGLE * i + PI / 5));
 		sphere.vertexPositions.push_back((-1) * r * sinf(V_ANGLE));
 
-		sphere.textureCoords.push_back((2.0f * i + 1) * 46 / 5120 + 0.1f);
-		sphere.textureCoords.push_back(2.0f * 170 / 5120 + 0.9f);
+		sphere.textureCoords.push_back((2.0f * i + 1) * 46 / 5120 + t1[0]);
+		sphere.textureCoords.push_back(2.0f * 170 / 5120 + t1[1]);
 
 		// Bottom vertex of the sphere
 		sphere.vertexPositions.push_back(0);
 		sphere.vertexPositions.push_back(0);
 		sphere.vertexPositions.push_back(-r);
 
-		sphere.textureCoords.push_back((1.0f + 2.0f * i) * 46 / 5120 + 0.1f);
-		sphere.textureCoords.push_back(3.0f * 170 / 5120 + 0.9f);
+		sphere.textureCoords.push_back((1.0f + 2.0f * i) * 46 / 5120 + t1[0]);
+		sphere.textureCoords.push_back(3.0f * 170 / 5120 + t1[1]);
 
 		if (i < 5) {
 			// Top pentagon
@@ -269,16 +294,16 @@ Mesh createSphereMesh(float r, int subdivision) {
 	return sphere;
 }
 
-Model getSphereModel(float x, float y, float z, float r) {
-	Mesh spheremesh = createSphereMesh(r,4);
+Model getSphereModel(float x, float y, float z, float r, const std::string& texture) {
+	Mesh spheremesh = createSphereMesh(r,4,texture);
 	translateMesh(x, y, z, &spheremesh);
 	Model spheremodel(spheremesh);
 	return spheremodel;
 }
 
-void addSphereModel(float x,float y,float z, float r, Renderer* renderer) {
+void addSphereModel(float x,float y,float z, float r, Renderer* renderer, const std::string& texture) {
 	auto sphereModel = new Model;
-	*sphereModel = getSphereModel(x,y,z,r);
+	*sphereModel = getSphereModel(x,y,z,r,texture);
 	renderer->addModel(sphereModel);
 }
 
@@ -398,7 +423,7 @@ void computeHalfVertex(const float v1[3], const float v2[3], float newV[3], floa
 	newV[2] *= scale;
 }
 
-Mesh createCylinderMesh(float r, float h) {
+Mesh createCylinderMesh(float r, float h, const std::string& texture) {
 	Mesh cylinder;
 
 	// Constants for angle calculations
@@ -425,14 +450,14 @@ Mesh createCylinderMesh(float r, float h) {
 
 		float t1[2], t2[2], t3[2], t4[2], t5[2], t6[2], t7[2];
 
-		getTexturecoords(t1, "bark");
-		getTexturecoords(t2, "bark");
-		getTexturecoords(t3, "bark");
+		getTexturecoords(t1, texture);
+		getTexturecoords(t2, texture);
+		getTexturecoords(t3, texture);
 
-		getTexturecoords(t4, "bark");
-		getTexturecoords(t5, "bark");
-		getTexturecoords(t6, "bark");
-		getTexturecoords(t7, "bark");
+		getTexturecoords(t4, texture);
+		getTexturecoords(t5, texture);
+		getTexturecoords(t6, texture);
+		getTexturecoords(t7, texture);
 
 		addRelativetoTexture(t1, 0.5f, 0.5f);
 		addRelativetoTexture(t2, 0.5f + cosf(H_ANGLE * i)/2, 0.5f + sinf(H_ANGLE * i)/2);
@@ -469,20 +494,20 @@ Mesh createCylinderMesh(float r, float h) {
 	return cylinder;
 }
 
-Model getCylinderModel(float x, float y, float z, float r, float h) {
-	Mesh cylinderMesh = createCylinderMesh(r, h);
-	translateMesh(x, y, z, &cylinderMesh);
+Model getCylinderModel(float x, float y, float z, float r, float h, const std::string& texture) {
+	Mesh cylinderMesh = createCylinderMesh(r * 0.1f, h * 0.1f,texture);
+	translateMesh(x * 0.1f, y * 0.1f, z * 0.1f, &cylinderMesh);
 	Model cylinderModel(cylinderMesh);
 	return cylinderModel;
 }
 
-void addCylinderModel(float x, float y, float z, float r, float h, Renderer* renderer) {
+void addCylinderModel(float x, float y, float z, float r, float h, Renderer* renderer, const std::string& texture) {
 	auto cylinderModel = new Model;
-	*cylinderModel = getCylinderModel(x, y, z, r, h);
+	*cylinderModel = getCylinderModel(x, y, z, r, h,texture);
 	renderer->addModel(cylinderModel);
 }
 
-Mesh createCubeMesh(float l) {
+Mesh createCubeMesh(float l, const std::string& texture) {
 	Mesh cube;
 
 	float top1[3] = { l / 2,l / 2,l / 2 };
@@ -515,10 +540,10 @@ Mesh createCubeMesh(float l) {
 
 	float t1[2], t2[2], t3[2], t4[2];
 
-	getTexturecoords(t1, "bark");
-	getTexturecoords(t2, "bark");
-	getTexturecoords(t3, "bark");
-	getTexturecoords(t4, "bark");
+	getTexturecoords(t1, texture);
+	getTexturecoords(t2, texture);
+	getTexturecoords(t3, texture);
+	getTexturecoords(t4, texture);
 
 	addRelativetoTexture(t2, 1.0f, 0.0f);
 	addRelativetoTexture(t3, 0.0f, 1.0f);
@@ -534,20 +559,20 @@ Mesh createCubeMesh(float l) {
 	return cube;
 }
 
-Model getCubeModel(float x, float y, float z, float l) {
-	Mesh cubeMesh = createCubeMesh(l);
-	translateMesh(x, y, z, &cubeMesh);
+Model getCubeModel(float x, float y, float z, float l, const std::string& texture) {
+	Mesh cubeMesh = createCubeMesh(l * 0.1f,texture);
+	translateMesh(x * 0.1f, y * 0.1f, z * 0.1f, &cubeMesh);
 	Model cubeModel(cubeMesh);
 	return cubeModel;
 }
 
-void addCubeModel(float x, float y, float z, float l, Renderer* renderer) {
+void addCubeModel(float x, float y, float z, float l, Renderer* renderer, const std::string& texture) {
 	auto cubeModel = new Model;
-	*cubeModel = getCubeModel(x, y, z, l);
+	*cubeModel = getCubeModel(x, y, z, l,texture);
 	renderer->addModel(cubeModel);
 }
 
-Mesh createTorusMesh(float r1, float r2) {
+Mesh createTorusMesh(float r1, float r2, const std::string& texture) {
 	Mesh torus;
 
 	// Constants for angle calculations
@@ -572,10 +597,10 @@ Mesh createTorusMesh(float r1, float r2) {
 
 			float t1[2], t2[2], t3[2], t4[2];
 
-			getTexturecoords(t1, "bark");
-			getTexturecoords(t2, "bark");
-			getTexturecoords(t3, "bark");
-			getTexturecoords(t4, "bark");
+			getTexturecoords(t1, texture);
+			getTexturecoords(t2, texture);
+			getTexturecoords(t3, texture);
+			getTexturecoords(t4, texture);
 
 			addRelativetoTexture(t1, 0.0f, 0.0f);
 			addRelativetoTexture(t2, 1.0f, 0.0f);
@@ -619,20 +644,20 @@ Mesh createTorusMesh(float r1, float r2) {
 	return torus;
 }
 
-Model getTorusModel(float x, float y, float z, float r1, float r2) {
-	Mesh torusMesh = createTorusMesh(r1, r2);
-	translateMesh(x, y, z, &torusMesh);
+Model getTorusModel(float x, float y, float z, float r1, float r2, const std::string& texture) {
+	Mesh torusMesh = createTorusMesh(r1 * 0.1f, r2 * 0.1f,texture);
+	translateMesh(x * 0.1f, y * 0.1f, z * 0.1f, &torusMesh);
 	Model torusModel(torusMesh);
 	return torusModel;
 }
 
-void addTorusModel(float x, float y, float z, float r1, float r2, Renderer* renderer) {
+void addTorusModel(float x, float y, float z, float r1, float r2, Renderer* renderer, const std::string& texture) {
 	auto torusModel = new Model;
-	*torusModel = getTorusModel(x, y, z, r1, r2);
+	*torusModel = getTorusModel(x, y, z, r1, r2,texture);
 	renderer->addModel(torusModel);
 }
 
-Mesh createConicalMesh(float rupp, float rdown, float h) {
+Mesh createConicalMesh(float rupp, float rdown, float h, const std::string& texture) {
 	Mesh conical;
 
 	// Constants for angle calculations
@@ -659,14 +684,14 @@ Mesh createConicalMesh(float rupp, float rdown, float h) {
 
 		float t1[2], t2[2], t3[2], t4[2], t5[2], t6[2], t7[2];
 
-		getTexturecoords(t1, "bark");
-		getTexturecoords(t2, "bark");
-		getTexturecoords(t3, "bark");
+		getTexturecoords(t1, texture);
+		getTexturecoords(t2, texture);
+		getTexturecoords(t3, texture);
 
-		getTexturecoords(t4, "bark");
-		getTexturecoords(t5, "bark");
-		getTexturecoords(t6, "bark");
-		getTexturecoords(t7, "bark");
+		getTexturecoords(t4, texture);
+		getTexturecoords(t5, texture);
+		getTexturecoords(t6, texture);
+		getTexturecoords(t7, texture);
 
 		addRelativetoTexture(t1, 0.5f, 0.5f);
 		addRelativetoTexture(t2, 0.5f + cosf(H_ANGLE * i) / 2, 0.5f + sinf(H_ANGLE * i) / 2);
@@ -703,20 +728,20 @@ Mesh createConicalMesh(float rupp, float rdown, float h) {
 	return conical;
 }
 
-Model getConicalModel(float x, float y, float z, float rupp, float rdown, float h) {
-	Mesh conicalMesh = createConicalMesh(rupp, rdown, h);
-	translateMesh(x, y, z, &conicalMesh);
+Model getConicalModel(float x, float y, float z, float rupp, float rdown, float h, const std::string& texture) {
+	Mesh conicalMesh = createConicalMesh(rupp * 0.1f, rdown * 0.1f, h * 0.1f,texture);
+	translateMesh(x * 0.1f, y * 0.1f, z * 0.1f, &conicalMesh);
 	Model conicalModel(conicalMesh);
 	return conicalModel;
 }
 
-void addConicalModel(float x, float y, float z, float rupp, float rdown, float h, Renderer* renderer) {
+void addConicalModel(float x, float y, float z, float rupp, float rdown, float h, Renderer* renderer,const std::string& texture) {
 	auto conicalModel = new Model;
-	*conicalModel = getConicalModel(x, y, z, rupp, rdown, h);
+	*conicalModel = getConicalModel(x, y, z, rupp, rdown, h,texture);
 	renderer->addModel(conicalModel);
 }
 
-Mesh createCuboidMesh(float l, float w,float h) {
+Mesh createCuboidMesh(float l, float w,float h, const std::string& texture) {
 	Mesh cuboid;
 
 	float top1[3] = { l / 2,w / 2,h/ 2 };
@@ -749,10 +774,10 @@ Mesh createCuboidMesh(float l, float w,float h) {
 
 	float t1[2], t2[2], t3[2], t4[2];
 
-	getTexturecoords(t1, "bark");
-	getTexturecoords(t2, "bark");
-	getTexturecoords(t3, "bark");
-	getTexturecoords(t4, "bark");
+	getTexturecoords(t1, texture);
+	getTexturecoords(t2, texture);
+	getTexturecoords(t3, texture);
+	getTexturecoords(t4, texture);
 
 	addRelativetoTexture(t2, 1.0f, 0.0f);
 	addRelativetoTexture(t3, 0.0f, 1.0f);
@@ -768,20 +793,20 @@ Mesh createCuboidMesh(float l, float w,float h) {
 	return cuboid;
 }
 
-Model getCuboidModel(float x, float y, float z, float l, float w, float h) {
-	Mesh cuboidMesh = createCuboidMesh(l, w, h);
-	translateMesh(x, y, z, &cuboidMesh);
+Model getCuboidModel(float x, float y, float z, float l, float w, float h, const std::string& texture) {
+	Mesh cuboidMesh = createCuboidMesh(l*0.1f, w * 0.1f, h * 0.1f,texture);
+	translateMesh(x * 0.1f, y * 0.1f, z * 0.1f, &cuboidMesh);
 	Model cuboidModel(cuboidMesh);
 	return cuboidModel;
 }
 
-void addCuboidModel(float x, float y, float z, float l, float w, float h, Renderer* renderer) {
+void addCuboidModel(float x, float y, float z, float l, float w, float h, Renderer* renderer, const std::string& texture) {
 	auto cuboidModel = new Model;
-	*cuboidModel = getCuboidModel(x, y, z, l, w, h);
+	*cuboidModel = getCuboidModel(x, y, z, l, w, h,texture);
 	renderer->addModel(cuboidModel);
 }
 
-Mesh createPyramidMesh(float r) {
+Mesh createPyramidMesh(float r, const std::string& texture) {
 	Mesh pyramid;
 
 	float top[3] = { 0,0,r };
@@ -797,9 +822,9 @@ Mesh createPyramidMesh(float r) {
 
 	float t1[2], t2[2], t3[2];
 
-	getTexturecoords(t1, "bark");
-	getTexturecoords(t2, "bark");
-	getTexturecoords(t3, "bark");
+	getTexturecoords(t1, texture);
+	getTexturecoords(t2, texture);
+	getTexturecoords(t3, texture);
 
 	addRelativetoTexture(t1, 0.5f, 1.0f);
 	addRelativetoTexture(t2, 0.0f, 0.0f);
@@ -813,15 +838,254 @@ Mesh createPyramidMesh(float r) {
 	return pyramid;
 }
 
-Model getPyramidModel(float x, float y, float z, float r) {
-	Mesh pyramidMesh = createPyramidMesh(r);
-	translateMesh(x, y, z, &pyramidMesh);
+Model getPyramidModel(float x, float y, float z, float r, const std::string& texture) {
+	Mesh pyramidMesh = createPyramidMesh(r * 0.1f,texture);
+	translateMesh(x * 0.1f, y * 0.1f, z * 0.1f, &pyramidMesh);
 	Model pyramidModel(pyramidMesh);
 	return pyramidModel;
 }
 
-void addPyramidModel(float x, float y, float z, float r, Renderer* renderer) {
+void addPyramidModel(float x, float y, float z, float r, Renderer* renderer, const std::string& texture) {
 	auto pyramidModel = new Model;
-	*pyramidModel = getPyramidModel(x, y, z, r);
+	*pyramidModel = getPyramidModel(x, y, z, r, texture);
 	renderer->addModel(pyramidModel);
+}
+
+void createRoad(int x1, int y1, int x2, int y2, Renderer* renderer, const std::string& texture) {
+	const int ROADSUBDIVISION = 10;
+	int xcoords[ROADSUBDIVISION + 2];
+	int ycoords[ROADSUBDIVISION + 2];
+
+	xcoords[0] = x1;
+	xcoords[ROADSUBDIVISION + 1] = x2;
+	ycoords[0] = y1;
+	ycoords[ROADSUBDIVISION + 1] = y2;
+
+	int xlength = abs(x1 - x2);
+	int ylength = abs(y1 - y2);
+
+	//std::cout << xlength << " " << ylength << std::endl;
+	int disp = 0;
+
+	for (int i = 1; i < ROADSUBDIVISION + 1; i++) {
+		disp = rand() % 10;
+
+		xcoords[i] = x1 + xlength * i / (ROADSUBDIVISION + 1) + disp / (i % 3 + 1);
+		ycoords[i] = y1 + ylength * i / (ROADSUBDIVISION + 1) + disp / (i % 3 + 1);
+		//fstd::cout << xcoords[i] << " " << ycoords[i] << std::endl;
+	}
+
+	addRoadModel(xcoords, ycoords, ROADSUBDIVISION + 2, renderer, texture);
+}
+
+void createRoadBetter(int x1, int y1, int x2, int y2, Renderer* renderer, const std::string& texture) {
+	const int ROADSUBDIVISION = 3;
+	const int arraysize = (1 << ROADSUBDIVISION) + 1;
+	int xcoords[arraysize];
+	int ycoords[arraysize];
+	srand(time(NULL));
+
+	xcoords[0] = x1;
+	xcoords[arraysize-1] = x2;
+	ycoords[0] = y1;
+	ycoords[arraysize-1] = y2;
+
+	int xlength = abs(x1 - x2);
+	int ylength = abs(y1 - y2);
+
+	int xsectionlength = xlength / (arraysize - 1);
+	int ysectionlength = ylength / (arraysize - 1);
+
+	//std::cout << xlength << " " << ylength << std::endl;
+	int dispx = 0;
+	int dispy = 0;
+
+	int sections = 0;
+	int newpoints = 0;
+
+	int index = 0;
+
+	for (int i = 0; i < ROADSUBDIVISION; i++) {
+		sections = 1 << (i+1);
+		newpoints = 1 << i;
+
+		index = 1 << (ROADSUBDIVISION - 1 - i);
+		for (int j = 0; j < newpoints; j++) {
+			if (xsectionlength!=0) dispx = rand() % (xsectionlength);
+			if (ysectionlength!=0) dispy = rand() % (ysectionlength);
+
+			xcoords[index] = x1 + xsectionlength*index + dispx;
+			ycoords[index] = y1 + ysectionlength*index + dispy;
+			//std::cout << xcoords[index] << " " << ycoords[index] << " " << index << std::endl;
+			index = index + (arraysize - 1) / newpoints;
+		}
+	}
+
+	addRoadModel(xcoords, ycoords, arraysize, renderer, texture);
+}
+
+Mesh createRoadMesh(int* xcoords, int* ycoords, int size, const std::string& texture) {
+	const float ROADWIDTH = 1.5f;
+	const float PI = 3.1415926f;
+
+	Mesh roadMesh;
+
+	float vertex1[3], vertex2[3], vertex3[3], vertex4[3];
+	float tex1[2], tex2[2], tex3[2], tex4[2];
+
+	float xlen = xcoords[1] - xcoords[0];
+	float ylen = ycoords[1] - ycoords[0];
+
+	float angle = atanf(ylen / xlen) + PI / 2.0f;
+
+	vertex1[0] = (xcoords[0] + ROADWIDTH * cosf(angle)) * 0.1f;
+	vertex1[1] = (ycoords[0] + ROADWIDTH * sinf(angle)) * 0.1f;
+	vertex2[0] = (xcoords[0] - ROADWIDTH * cosf(angle)) * 0.1f;
+	vertex2[1] = (ycoords[0] - ROADWIDTH * sinf(angle)) * 0.1f;
+
+	vertex1[2] = 0.001f;
+	vertex2[2] = 0.001f;
+	vertex3[2] = 0.001f;
+	vertex4[2] = 0.001f;
+
+	for (int i = 1; i < size; i++) {
+		xlen = xcoords[i+1] - xcoords[i];
+		ylen = ycoords[i+1] - ycoords[i];
+
+		float newangle = atanf(ylen / xlen) + PI / 2.0f;
+		angle = (angle + newangle) / 2.0f;
+		//std::cout << xlen << " " << ylen << std::endl;
+		//std::cout << angle << std::endl;
+
+		vertex3[0] = (xcoords[i] + ROADWIDTH * cosf(angle)) * 0.1f;
+		vertex3[1] = (ycoords[i] + ROADWIDTH * sinf(angle)) * 0.1f;
+		vertex4[0] = (xcoords[i] - ROADWIDTH * cosf(angle)) * 0.1f;
+		vertex4[1] = (ycoords[i] - ROADWIDTH * sinf(angle)) * 0.1f;
+
+		getTexturecoords(tex1, texture);
+		getTexturecoords(tex2, texture);
+		getTexturecoords(tex3, texture);
+		getTexturecoords(tex4, texture);
+
+		addRelativetoTexture(tex1, 0.0f, 0.0f);
+		addRelativetoTexture(tex2, 1.0f, 0.0f);
+		addRelativetoTexture(tex3, 0.0f, 1.0f);
+		addRelativetoTexture(tex4, 1.0f, 1.0f);
+
+		addVertices(vertex1, vertex2, vertex3, &roadMesh);
+		addVertices(vertex2, vertex3, vertex4, &roadMesh);
+
+		addTextures(tex1, tex2, tex3, &roadMesh);
+		addTextures(tex2, tex3, tex4, &roadMesh);
+
+		addIndices((i - 1) * 6 + 0, (i - 1) * 6 + 1, (i - 1) * 6 + 2, &roadMesh);
+		addIndices((i - 1) * 6 + 3, (i - 1) * 6 + 4, (i - 1) * 6 + 5, &roadMesh);
+
+		vertex1[0] = vertex3[0];
+		vertex1[1] = vertex3[1];
+		vertex1[2] = vertex3[2];
+		vertex2[0] = vertex4[0];
+		vertex2[1] = vertex4[1];
+		vertex2[2] = vertex4[2];
+	}
+
+	return roadMesh;
+}
+
+Model getRoadModel(int* xcoords, int* ycoords, int size, const std::string& texture) {
+	Mesh roadMesh = createRoadMesh(xcoords, ycoords, size,texture);
+	Model roadModel(roadMesh);
+	return roadModel;
+}
+
+void addRoadModel(int* xcoords, int* ycoords, int size, Renderer* renderer, const std::string& texture) {
+	auto roadModel = new Model;
+	*roadModel = getRoadModel(xcoords, ycoords, size,texture);
+	renderer->addModel(roadModel);
+}
+
+Mesh createMountainMesh(float h, float r) {
+	Mesh mountainMesh;
+	std::string texture;
+
+	float t1[2], t2[2], t3[2], t4[2];
+	int index = 0;
+	float currentHeight = 0;
+
+	for (int i = -r; i <= r; i++) {
+		for (int j = -r; j <= r; j++) {
+			int temp = sqrt(abs(i) * abs(i) + abs(j) * abs(j));
+			if (temp >= r) continue;
+			mountainMesh.vertexPositions.push_back((i + 0.5f)*0.1f);
+			mountainMesh.vertexPositions.push_back((j + 0.5f) * 0.1f);
+			mountainMesh.vertexPositions.push_back(gaussFunction(h, i + 0.5f, j + 0.5f, r / 2) * 0.1f);
+
+			mountainMesh.vertexPositions.push_back((i + 0.5f) * 0.1f);
+			mountainMesh.vertexPositions.push_back((j - 0.5f) * 0.1f);
+			mountainMesh.vertexPositions.push_back(gaussFunction(h, i + 0.5f, j - 0.5f, r / 2) * 0.1f);
+
+			mountainMesh.vertexPositions.push_back((i - 0.5f)*0.1f);
+			mountainMesh.vertexPositions.push_back((j + 0.5f)*0.1f);
+			mountainMesh.vertexPositions.push_back(gaussFunction(h, i - 0.5f, j + 0.5f, r / 2) * 0.1f);
+
+			mountainMesh.vertexPositions.push_back((i + 0.5f)*0.1f);
+			mountainMesh.vertexPositions.push_back((j - 0.5f)*0.1f);
+			mountainMesh.vertexPositions.push_back(gaussFunction(h, i + 0.5f, j - 0.5f, r / 2) * 0.1f);
+
+			mountainMesh.vertexPositions.push_back((i - 0.5f)*0.1f);
+			mountainMesh.vertexPositions.push_back((j + 0.5f)*0.1f);
+			mountainMesh.vertexPositions.push_back(gaussFunction(h, i - 0.5f, j + 0.5f, r / 2) * 0.1f);
+
+			mountainMesh.vertexPositions.push_back((i - 0.5f)*0.1f);
+			mountainMesh.vertexPositions.push_back((j - 0.5f)*0.1f);
+			mountainMesh.vertexPositions.push_back(gaussFunction(h, i - 0.5f, j - 0.5f, r / 2) * 0.1f);
+
+			currentHeight = gaussFunction(h, i, j, r / 2) * 0.1f;
+			if (currentHeight < 0.6f) {
+				texture = "grass";
+			}
+			else if (currentHeight < 1.4f) {
+				texture = "stone";
+			}
+			else {
+				texture = "snow";
+			}
+
+			getTexturecoords(t1, texture);
+			getTexturecoords(t2, texture);
+			getTexturecoords(t3, texture);
+			getTexturecoords(t4, texture);
+
+			addRelativetoTexture(t1, 0.0f, 0.0f);
+			addRelativetoTexture(t2, 1.0f, 0.0f);
+			addRelativetoTexture(t3, 0.0f, 1.0f);
+			addRelativetoTexture(t4, 1.0f, 1.0f);
+
+			addTextures(t1, t2, t3, &mountainMesh);
+			addTextures(t2, t3, t4, &mountainMesh);
+
+			addIndices(index, index + 1, index + 2, &mountainMesh);
+			addIndices(index + 3, index + 4, index + 5, &mountainMesh);
+
+			index += 6;
+		}
+	}
+	return mountainMesh;
+}
+
+Model getMountainModel(float x, float y, float h, float r) {
+	Mesh mountainMesh = createMountainMesh(h, r);
+	translateMesh(x*0.1f, y*0.1f, -0.4f, &mountainMesh);
+	Model mountainModel(mountainMesh);
+	return mountainModel;
+}
+
+void addMountainModel(float x, float y, float h, float r, Renderer* renderer) {
+	auto mountainModel = new Model;
+	*mountainModel = getMountainModel(x, y, h, r);
+	renderer->addModel(mountainModel);
+}
+
+float gaussFunction(float peak, float x, float y, float deviation) {
+	return peak * exp(-1 * (x * x + y * y) / (2 * deviation * deviation));
 }

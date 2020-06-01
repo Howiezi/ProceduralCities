@@ -1,24 +1,70 @@
-sphere		0	1	1	0.4
-sphere		1	1	1	0.3
-sphere		2	1	1	0.5
-torus		0	2	1	0.2	0.1
-torus		1	2	1	0.2	0.2
-torus		2	2	1	0.2	0.3
-cylinder	0	3	1	0.4	0.5
-cylinder	1	3	1	0.3	1
-cylinder	2	3	1	0.2	1.5
-conical		0	4	1	0.4	0.2	0.5
-conical		1	4	1	0.5	0.2	1
-conical		2	4	1	0.4	0	1
-cube		0	5	1	0.5
-cube		1	5	1	0.3
-cube		2	5	1	0.4
-cuboid		0	6	1	0.5	0.7	0.3
-cuboid		1	6	1	0.4	0.2	0.5
-cuboid		2	6	1	0.2	0.6	0.4
-pyramid		0	7	1	0.4
-pyramid		1	7	1	0.2
-pyramid		2	7	1	0.7
+shape		x	y	z	dimensions					texture
+cube		50	30	1	2							apartment
+cube		50	30	0.6	0.9							road
+cuboid		54	30	2	2	2	4					apartment
+cuboid		54	30	2.1	1.9	1.9	4					road
+cuboid		54	34	1.5	4	2	3					apartment
+cuboid		54	34	1.6	3.9	1.9	3					road
+cuboid		50	34	1.5	3	2	3					apartment
+cuboid		50	34	1.6	2.9	1.9	3					road
+road		12	22	52	32
+cube		10	20	1	2							apartment
+cube		10	20	0.6	0.9							road
+cuboid		14	20	2	2	2	4					apartment
+cuboid		14	20	2.1	1.9	1.9	4					road
+cuboid		14	24	1.5	4	2	3					apartment
+cuboid		14	24	1.6	3.9	1.9	3					road
+cuboid		10	24	1.5	3	2	3					apartment
+cuboid		10	24	1.6	2.9	1.9	3					road
+road		52	32	77	74
+cube		74	72	1	2							apartment
+cube		74	72	0.6	0.9							road
+cuboid		78	72	2	2	2	4					apartment
+cuboid		78	72	2.1	1.9	1.9	4					road
+cuboid		78	76	1.5	4	2	3					apartment
+cuboid		78	76	1.6	3.9	1.9	3					road
+cuboid		74	76	1.5	3	2	3					apartment
+cuboid		74	76	1.6	2.9	1.9	3					road
+road		12	22	16	59
+road		10	59	77	74
+cube		8	57	1	2							apartment
+cube		8	57	0.6	0.9							road
+cuboid		12	57	2	2	2	4					apartment
+cuboid		12	57	2.1	1.9	1.9	4					road
+cuboid		12	61	1.5	4	2	3					apartment
+cuboid		12	61	1.6	3.9	1.9	3					road
+cuboid		8	61	1.5	3	2	3					apartment
+cuboid		8	61	1.6	2.9	1.9	3					road
+road		8	59	8	92
+cube		8	90	1	2							apartment
+cube		8	90	0.6	0.9							road
+cuboid		12	90	2	2	2	4					apartment
+cuboid		12	90	2.1	1.9	1.9	4					road
+cuboid		12	94	1.5	4	2	3					apartment
+cuboid		12	94	1.6	3.9	1.9	3					road
+cuboid		8	94	1.5	3	2	3					apartment
+cuboid		8	94	1.6	2.9	1.9	3					road
+mountain	47	13	20	10
+mountain	20	77	18	5
+mountain	66	30	8	7
+mountain	64	80	5	9
+mountain	52	86	16	6
+mountain	34	45	12	7
+mountain	26	37	16	6
+mountain	76	16	11	9
+mountain	85	64	16	9
+mountain	66	45	8	7
+mountain	80	29	7	7
+mountain	14	14	17	5
+
 tree		10	0
-tree		13	0
-road		50	50	70	90
+road		41	41	200	100
+mountain	30	20	20	10
+
+sphere		0	0	1	0.4			grass
+torus		0	1	1	0.2	0.1		bark
+cylinder	0	2	1	0.4	0.5		stone
+conical		1	0	1	0.4	0.2	0.5	snow
+cube		1	1	1	0.5			road
+cuboid		1	2	1	0.5	0.7	0.3	stone
+pyramid		2	0	1	0.4			grass

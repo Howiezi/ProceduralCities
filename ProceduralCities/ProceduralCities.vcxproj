@@ -169,6 +169,13 @@
     <None Include="standard.frag" />
     <None Include="standard.vert" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="heightVariation.txt" />
+    <Text Include="Models.txt" />
+    <Text Include="otherObjects.txt" />
+    <Text Include="voxelExample.txt" />
+    <Text Include="voxelSpheres.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

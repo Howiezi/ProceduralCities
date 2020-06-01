@@ -7,14 +7,17 @@
 
 void Application::runLoop(){
 	Renderer mRender;
-	//addSquareModelLess(100, &mRender);
-	addWorldModelFromFile("heightmap.ppm",&mRender);
+	//addWorldModelFromFile("heightmap.ppm",&mRender);
+	addSquareModel(100,&mRender);
+	//addSquareModelLess(11, &mRender);
 
 	readModelsTextfile("Models.txt",&mRender);
+
 	//addTreeModel(0.6f, 0.6f, &mRender);
 	Texture btex("Textures/atlas.png");
-	// Uncomment for polygon mode
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	// Uncomment for polygon lines
+	// mRender.setLineMode(true);
 	while (!glfwWindowShouldClose(m_window)) {
 		// per-frame time logic
 			// --------------------

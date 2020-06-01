@@ -2,13 +2,17 @@
 #define SQAUREMESH_H_INCLUDED
 
 #include "model.h"
+#include "meshUtility.h"
 
 Mesh createSquare(int size);
 Model getSquareModel(int size);
 void addSquareModelLess(int size, Renderer *renderer);
 
 Mesh createSquare(int size) {
-	Mesh mesh;
+	WorldMesh mesh;
+	mesh.width = size;
+	mesh.height = size;
+
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
 			mesh.vertexPositions.push_back(x*0.1f);
@@ -28,7 +32,7 @@ Mesh createSquare(int size) {
 			mesh.vertexPositions.push_back(0);
 
 			mesh.textureCoords.push_back(0 / 10.0f + 0.0f);
-			mesh.textureCoords.push_back(1 / 10.0f + 0.9f);
+			mesh.textureCoords.push_back(0 / 10.0f + 0.9f);
 
 			mesh.textureCoords.push_back(1 / 10.0f + 0.0f);
 			mesh.textureCoords.push_back(0 / 10.0f + 0.9f);
@@ -48,6 +52,10 @@ Mesh createSquare(int size) {
 			mesh.indices.push_back(3+x*4+y*4*size);
 		}
 	}
+
+	//createMountain(&mesh, 100, 100, 20, 10);
+
+	//changeHeightWorldMesh(&mesh, 30, 20, 1);
 
 	return mesh;
 }

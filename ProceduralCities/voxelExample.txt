@@ -1,0 +1,51 @@
+cube	0	0	4	1		grass
+cube	0	0	3	1		dirt
+cube	0	0	2	1		dirt
+cube	0	0	1	1		stone
+cube	0	0	0	1		stone
+			1
+cube	1	0	5	1		grass
+cube	1	0	4	1		dirt
+cube	1	0	3	1		stone
+cube	1	0	2	1		dirt
+cube	1	0	1	1		stone
+cube	1	0	0	1		stone
+			1
+cube	2	0	4	1		grass
+cube	2	0	3	1		dirt
+cube	2	0	2	1		dirt
+cube	2	0	1	1		stone
+cube	2	0	0	1		stone
+			1
+cube	3	0	5	1		grass
+cube	3	0	4	1		dirt
+cube	3	0	3	1		dirt
+cube	3	0	2	1		dirt
+cube	3	0	1	1		stone
+cube	3	0	0	1		stone
+			1
+cube	0	1	5	1		grass
+cube	0	1	4	1		dirt
+cube	0	1	3	1		dirt
+cube	0	1	2	1		dirt
+cube	0	1	1	1		stone
+cube	0	1	0	1		stone
+			1
+cube	1	1	4	1		grass
+cube	1	1	3	1		stone
+cube	1	1	2	1		dirt
+cube	1	1	1	1		stone
+cube	1	1	0	1		stone
+			1
+cube	2	1	4	1		grass
+cube	2	1	3	1		dirt
+cube	2	1	2	1		dirt
+cube	2	1	1	1		stone
+cube	2	1	0	1		stone
+			1
+cube	3	1	5	1		grass
+cube	3	1	4	1		dirt
+cube	3	1	3	1		dirt
+cube	3	1	2	1		stone
+cube	3	1	1	1		stone
+cube	3	1	0	1		stone

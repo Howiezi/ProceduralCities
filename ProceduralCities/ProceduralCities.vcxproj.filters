@@ -131,4 +131,21 @@
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="voxelExample.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="voxelSpheres.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="heightVariation.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="otherObjects.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="Models.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>
